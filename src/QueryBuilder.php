@@ -112,25 +112,14 @@ class QueryBuilder extends Builder
     {
         $this->defaultSort = $sort;
 
-        $this->addSortsToQuery($this->request->sorts($this->defaultSort));
-
         return $this;
     }
 
     public function allowedSorts($sorts) : self
     {
         $sorts = is_array($sorts) ? $sorts : func_get_args();
-        if (! $this->request->sorts()) {
-            return $this;
-        }
 
         $this->allowedSorts = collect($sorts);
-
-        if (! $this->allowedSorts->contains('*')) {
-            $this->guardAgainstUnknownSorts();
-        }
-
-        $this->addSortsToQuery($this->request->sorts($this->defaultSort));
 
         return $this;
     }
@@ -321,6 +310,14 @@ class QueryBuilder extends Builder
 
     public function get($columns = ['*'])
     {
+        if ($this->request->sorts()) {
+            if (!$this->allowedSorts->contains('*')) {
+                $this->guardAgainstUnknownSorts();
+            }
+
+            $this->addSortsToQuery($this->request->sorts($this->defaultSort));
+        }
+
         $result = parent::get($columns);
 
         if (count($this->appends) > 0) {
