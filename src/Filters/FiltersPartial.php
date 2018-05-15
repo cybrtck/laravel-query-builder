@@ -11,11 +11,11 @@ class FiltersPartial implements Filter
         if (is_array($value)) {
             return $query->where(function (Builder $query) use ($value, $property) {
                 foreach ($value as $partialValue) {
-                    $query->orWhere($property, 'LIKE', "%{$partialValue}%");
+                    $query->orWhere($property, 'ILIKE', "%{$partialValue}%");
                 }
             });
         }
 
-        return $query->where($property, 'LIKE', "%{$value}%");
+        return $query->where($property, 'ILIKE', "%{$value}%");
     }
 }
